@@ -43,3 +43,4 @@ Le fichier Excel doit contenir les colonnes suivantes :
 - Les métriques de performance sont calculées uniquement sur les données historiques # moghit
 # moghit
 # Analyse-et-Pr-vision-de-l-EGT-Margin-l-aide-de-XGBoost-avec-Visualisation-dans-Streamlit
+# Analyse-et-Pr-vision-de-l-EGT-Margin-l-aide-de-XGBoost-avec-Visualisation-dans-Streamlit
