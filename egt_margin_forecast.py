@@ -20,15 +20,82 @@ st.set_page_config(
 # Titre de l'application
 st.title("📈 Analyse et Prévision de l'EGT Margin")
 
+# Fonction pour valider le fichier Excel
+def validate_excel_file(uploaded_file):
+    try:
+        # Vérifier la taille du fichier (max 10 Mo)
+        if uploaded_file.size > 10 * 1024 * 1024:  # 10 Mo en octets
+            st.error("❌ Le fichier est trop volumineux. Taille maximale autorisée : 10 Mo")
+            return None
+        
+        # Lire le fichier
+        df = pd.read_excel(uploaded_file)
+        
+        # Vérifier les colonnes requises
+        required_columns = ["Flight DateTime", "EGT Margin", "Vibration of the core", "CSN"]
+        missing_columns = [col for col in required_columns if col not in df.columns]
+        
+        if missing_columns:
+            st.error(f"❌ Colonnes manquantes dans le fichier : {', '.join(missing_columns)}")
+            return None
+            
+        # Conversion des types de données
+        df['Flight DateTime'] = pd.to_datetime(df['Flight DateTime'])
+        for col in ['EGT Margin', 'Vibration of the core']:
+            df[col] = df[col].astype(str).str.replace(',', '.')
+            df[col] = pd.to_numeric(df[col], errors='coerce')
+        df['CSN'] = pd.to_numeric(df['CSN'], errors='coerce')
+        
+        # Suppression des lignes avec des valeurs manquantes
+        df = df.dropna()
+        
+        if len(df) == 0:
+            st.error("❌ Le fichier ne contient aucune donnée valide après nettoyage")
+            return None
+            
+        return df
+        
+    except Exception as e:
+        st.error(f"❌ Erreur lors de la lecture du fichier : {str(e)}")
+        return None
+
+# Interface d'upload de fichier
+uploaded_file = st.file_uploader(
+    "📤 Choisir un fichier Excel (.xlsx)",
+    type=['xlsx'],
+    help="Sélectionnez un fichier Excel (.xlsx) avec les colonnes requises"
+)
+
+# Bouton de réinitialisation
+if st.button("🔄 Réinitialiser"):
+    st.session_state.clear()
+    st.experimental_rerun()
+
+# Chargement des données
+if uploaded_file is not None:
+    df = validate_excel_file(uploaded_file)
+    if df is not None:
+        st.success("✅ Fichier mis à jour avec succès")
+        st.write("Aperçu des données :")
+        st.dataframe(df.head())
+else:
+    # Chargement du fichier par défaut
+    try:
+        df = pd.read_excel("802290 data ready to use.xlsx")
+        df['Flight DateTime'] = pd.to_datetime(df['Flight DateTime'])
+        for col in ['EGT Margin', 'Vibration of the core']:
+            df[col] = df[col].astype(str).str.replace(',', '.')
+            df[col] = pd.to_numeric(df[col], errors='coerce')
+        df['CSN'] = pd.to_numeric(df['CSN'], errors='coerce')
+        df = df.dropna()
+    except Exception as e:
+        st.error(f"❌ Erreur lors du chargement du fichier par défaut : {str(e)}")
+        st.stop()
+
 # === Affichage du graphique initial EGT Margin vs CSN ===
 try:
-    df_diag = pd.read_excel("802290 data ready to use.xlsx")
-    df_diag['EGT Margin'] = pd.to_numeric(df_diag['EGT Margin'], errors='coerce')
-    df_diag['CSN'] = pd.to_numeric(df_diag['CSN'], errors='coerce')
-    df_diag = df_diag.dropna(subset=['EGT Margin', 'CSN'])
-
     fig_diag, ax = plt.subplots(figsize=(10, 4))
-    ax.plot(df_diag['CSN'], df_diag['EGT Margin'], color='blue')
+    ax.plot(df['CSN'], df['EGT Margin'], color='blue')
     ax.set_title("Évolution du EGT Margin en fonction du CSN")
     ax.set_xlabel("CSN (Cycle Since New)")
     ax.set_ylabel("EGT Margin (°C)")
@@ -40,22 +107,6 @@ except Exception as e:
 # Fonction pour charger et préparer les données
 @st.cache_data
 def load_and_prepare_data():
-    # Chargement des données
-    df = pd.read_excel("802290 data ready to use.xlsx")
-    
-    # Conversion des colonnes en types appropriés
-    df['Flight DateTime'] = pd.to_datetime(df['Flight DateTime'])
-
-    # Correction : forcer la conversion en string avant .str.replace
-    for col in ['EGT Margin', 'Vibration of the core']:
-        df[col] = df[col].astype(str).str.replace(',', '.')
-        df[col] = pd.to_numeric(df[col], errors='coerce')
-
-    df['CSN'] = pd.to_numeric(df['CSN'], errors='coerce')
-    
-    # Suppression des lignes avec des valeurs manquantes
-    df = df.dropna()
-    
     return df
 
 # Fonction pour créer les variables de lag
