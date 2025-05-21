@@ -47,3 +47,12 @@ Le fichier Excel doit contenir les colonnes suivantes :
 # Analyse-et-Pr-vision-de-l-EGT-Margin-l-aide-de-XGBoost-avec-Visualisation-dans-Streamlit
 # Analyse-et-Pr-vision-de-l-EGT-Margin-l-aide-de-XGBoost
 # Analyse-et-Pr-vision-de-l-EGT-Margin-l-aide-de-XGBoost
+python3 -m venv venv311
+source venv311/bin/activate
+
+python3 -m pip install -r requirements.txt
+
+python3 -m streamlit run egt_margin_forecast.py
+
+xcode-select --install
+pip install watchdog
