@@ -1,5 +1,5 @@
 #!/bin/sh
-'''exec' "/Users/MAC/moghit /venv311/bin/python3.11" "$0" "$@"
+'''exec' "/Users/MAC/moghit /Analyse-et-Pr-vision-de-l-EGT-Margin-l-aide-de-XGBoost/venv311/bin/python3.13" "$0" "$@"
 ' '''
 # -*- coding: utf-8 -*-
 import re
