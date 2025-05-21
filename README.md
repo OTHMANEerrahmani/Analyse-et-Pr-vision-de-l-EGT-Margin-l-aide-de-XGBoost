@@ -42,3 +42,4 @@ Le fichier Excel doit contenir les colonnes suivantes :
 - La zone critique (15°C - 18°C) est mise en évidence en rouge sur le graphique
 - Les métriques de performance sont calculées uniquement sur les données historiques # moghit
 # moghit
+# Analyse-et-Pr-vision-de-l-EGT-Margin-l-aide-de-XGBoost-avec-Visualisation-dans-Streamlit
